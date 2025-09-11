@@ -1,46 +1,83 @@
-<div align="center">
-  <img src="https://raw.githubusercontent.com/StouderIO/adonis-auditing/main/.github/images/header.png" />
-  <h3>@stouder-io/adonis-auditing</h3>
-  <p>Audit your Lucid models with ease.</p>
-  <a href="https://www.npmjs.com/package/@stouder-io/adonis-auditing">
-    <img src="https://img.shields.io/npm/v/@stouder-io/adonis-auditing.svg?style=for-the-badge&logo=npm" />
-  </a>
-  <img src="https://img.shields.io/npm/l/@stouder-io/adonis-auditing?color=blueviolet&style=for-the-badge" />
-  <img alt="npm" src="https://img.shields.io/npm/dt/@stouder-io/adonis-auditing?style=for-the-badge">
-  <img alt="All Contributors" src="https://img.shields.io/github/all-contributors/StouderIO/adonis-auditing?color=ee8449&style=for-the-badge">
-</div>
+# Adonis Auditing
 
-# Official Documentation
+> **Este é um fork do projeto original [StouderIO/adonis-auditing](https://github.com/StouderIO/adonis-auditing) com melhorias e correções de bugs.**
 
-For more information, please refer to the [official documentation](https://adonis-auditing.stouder.io/).
+Audite seus modelos Lucid com facilidade no AdonisJS. Este pacote permite rastrear automaticamente todas as alterações feitas em seus modelos, mantendo um histórico completo de auditoria.
 
-## Contributors ✨
+## ✨ Melhorias e Correções
 
-Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+- Correções de bugs relacionados à importação dinâmica de dependências
+- Melhorias na configuração e estabilidade do pacote
+- Atualizações de compatibilidade com versões mais recentes do AdonisJS
+- Correções em problemas de CI/CD
 
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<table>
-  <tbody>
-    <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://stouder.io"><img src="https://avatars.githubusercontent.com/u/2575182?v=4?s=100" width="100px;" alt="Xavier Stouder"/><br /><sub><b>Xavier Stouder</b></sub></a><br /><a href="https://github.com/StouderIO/adonis-auditing/commits?author=Xstoudi" title="Code">💻</a> <a href="https://github.com/StouderIO/adonis-auditing/commits?author=Xstoudi" title="Documentation">📖</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Julien-R44"><img src="https://avatars.githubusercontent.com/u/8337858?v=4?s=100" width="100px;" alt="Julien Ripouteau"/><br /><sub><b>Julien Ripouteau</b></sub></a><br /><a href="#question-Julien-R44" title="Answering Questions">💬</a></td>
-    </tr>
-  </tbody>
-</table>
+## 📦 Instalação
 
-<!-- markdownlint-restore -->
-<!-- prettier-ignore-end -->
+Você pode instalar o pacote usando o comando ace do AdonisJS para configuração automática:
 
-<!-- ALL-CONTRIBUTORS-LIST:END -->
+```sh
+node ace add @stouder-io/adonis-auditing
+```
 
-This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+Ou instalar manualmente usando seu gerenciador de pacotes favorito:
 
-## Special thanks
+```sh
+# npm
+npm install @stouder-io/adonis-auditing
+node ace configure @stouder-io/adonis-auditing
 
-- Laravel Auditing package for the inspiration.
+# pnpm
+pnpm install @stouder-io/adonis-auditing
+node ace configure @stouder-io/adonis-auditing
 
-# License
+# yarn
+yarn add @stouder-io/adonis-auditing
+node ace configure @stouder-io/adonis-auditing
+```
 
-This project is open-sourced software licensed under the [MIT license](LICENSE.md).
+## 🚀 Uso Básico
+
+Para usar a auditoria em seus modelos, você precisa adicionar o mixin `Auditable` usando o helper `compose`:
+
+```typescript
+import { DateTime } from 'luxon'
+import { BaseModel, column } from '@adonisjs/lucid/orm'
+import { compose } from '@adonisjs/core/helpers'
+import { Auditable } from '@stouder-io/adonis-auditing'
+
+export default class Book extends compose(BaseModel, Auditable) {
+  @column({ isPrimary: true })
+  declare id: number
+
+  @column()
+  declare title: string
+
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+}
+```
+
+Após adicionar o mixin, todas as operações de criação, atualização e exclusão serão automaticamente auditadas.
+
+## 📚 Documentação Completa
+
+Para documentação detalhada, configurações avançadas, resolvers personalizados e mais exemplos, acesse a pasta **`docs/`** deste repositório ou consulte os seguintes guias:
+
+- [Introdução](docs/guide/introduction.md)
+- [Instalação](docs/guide/installation.md)
+- [Configuração do Model](docs/guide/model-setup.md)
+- [Configuração Geral](docs/guide/general-configuration.md)
+- [Obtendo Auditorias](docs/guide/getting-audits.md)
+- [Resolver de Usuário](docs/guide/user-resolver.md)
+- [Resolvers de Auditoria](docs/guide/audit-resolvers.md)
+
+## 📄 Licença
+
+MIT
+
+## 🙏 Créditos
+
+Este projeto é baseado no trabalho original de [Xavier Stouder](https://github.com/StouderIO) no repositório [adonis-auditing](https://github.com/StouderIO/adonis-auditing).
