@@ -34,6 +34,11 @@ yarn add adonis-auditing
 node ace configure adonis-auditing
 ```
 
+```sh
+# rodar a migration para criar a tabela de auditoria
+node ace migration:run
+```
+
 ## 🚀 Uso Básico
 
 Para usar a auditoria em seus modelos, você precisa adicionar o mixin `Auditable` usando o helper `compose`:
