@@ -3,7 +3,7 @@
 Auditing configuration is located in the `config/auditing.ts` file. By default, the file looks like this:
 
 ```typescript
-import { defineConfig } from '@stouder-io/adonis-auditing/setup'
+import { defineConfig } from 'adonis-auditing/setup'
 
 export default defineConfig({
   userResolver: () => import('#audit_resolvers/user_resolver'),

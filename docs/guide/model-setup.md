@@ -9,7 +9,7 @@ To install the package and all its dependencies, please refer to the [Installati
 import { DateTime } from 'luxon'
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { compose } from '@adonisjs/core/helpers'
-import { Auditable } from '@stouder-io/adonis-auditing'
+import { Auditable } from 'adonis-auditing'
 
 export default class Book extends compose(BaseModel, Auditable) {
   @column({ isPrimary: true })

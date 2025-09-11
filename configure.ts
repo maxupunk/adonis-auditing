@@ -13,7 +13,7 @@ export async function configure(command: ConfigureCommand) {
 
   // add provider and directory to rc file
   await codemods.updateRcFile((transformer) => {
-    transformer.addProvider('@stouder-io/adonis-auditing/auditing_provider')
+    transformer.addProvider('adonis-auditing/auditing_provider')
     transformer.setDirectory('audit_resolvers', 'app/audit_resolvers')
   })
 

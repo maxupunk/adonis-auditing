@@ -18,7 +18,7 @@ You can create your own resolver by implementing the `Resolver` interface.
 
 ```typescript
 import { HttpContext } from '@adonisjs/core/http'
-import { Resolver } from '@stouder-io/adonis-auditing'
+import { Resolver } from 'adonis-auditing'
 
 export default class RandomResolver implements Resolver {
   async resolve(ctx: HttpContext) {

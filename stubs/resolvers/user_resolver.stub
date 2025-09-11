@@ -2,7 +2,7 @@
   exports({ to: app.makePath(path, 'user_resolver.ts') })
 }}}
 import { HttpContext } from '@adonisjs/core/http'
-import { UserResolver } from '@stouder-io/adonis-auditing'
+import { UserResolver } from 'adonis-auditing'
 
 export default class implements UserResolver {
   async resolve({ auth }: HttpContext): Promise<{ id: string; type: string } | null> {

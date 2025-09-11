@@ -2,7 +2,7 @@
   exports({ to: app.makePath(path, 'ip_address_resolver.ts') })
 }}}
 import { HttpContext } from '@adonisjs/core/http'
-import { Resolver } from '@stouder-io/adonis-auditing'
+import { Resolver } from 'adonis-auditing'
 
 export default class IpAddressResolver implements Resolver {
   async resolve(ctx: HttpContext) {

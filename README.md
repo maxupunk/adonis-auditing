@@ -15,23 +15,23 @@ Audite seus modelos Lucid com facilidade no AdonisJS. Este pacote permite rastre
 Você pode instalar o pacote usando o comando ace do AdonisJS para configuração automática:
 
 ```sh
-node ace add @stouder-io/adonis-auditing
+node ace add adonis-auditing
 ```
 
 Ou instalar manualmente usando seu gerenciador de pacotes favorito:
 
 ```sh
 # npm
-npm install @stouder-io/adonis-auditing
-node ace configure @stouder-io/adonis-auditing
+npm install adonis-auditing
+node ace configure adonis-auditing
 
 # pnpm
-pnpm install @stouder-io/adonis-auditing
-node ace configure @stouder-io/adonis-auditing
+pnpm install adonis-auditing
+node ace configure adonis-auditing
 
 # yarn
-yarn add @stouder-io/adonis-auditing
-node ace configure @stouder-io/adonis-auditing
+yarn add adonis-auditing
+node ace configure adonis-auditing
 ```
 
 ## 🚀 Uso Básico
@@ -42,7 +42,7 @@ Para usar a auditoria em seus modelos, você precisa adicionar o mixin `Auditabl
 import { DateTime } from 'luxon'
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { compose } from '@adonisjs/core/helpers'
-import { Auditable } from '@stouder-io/adonis-auditing'
+import { Auditable } from 'adonis-auditing'
 
 export default class Book extends compose(BaseModel, Auditable) {
   @column({ isPrimary: true })
