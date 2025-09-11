@@ -23,12 +23,12 @@ export default class Audit extends BaseModel {
 
   @column({
     consume: (value) => {
-      if (!value) return null;
-      if (typeof value === 'object') return value;
+      if (!value) return null
+      if (typeof value === 'object') return value
       try {
-        return JSON.parse(value);
+        return JSON.parse(value)
       } catch (e) {
-        console.error("Failed to parse value:", value, e);
+        console.error('Failed to parse value:', value, e)
         return null
       }
     },
@@ -39,12 +39,12 @@ export default class Audit extends BaseModel {
 
   @column({
     consume: (value) => {
-      if (!value) return null;
-      if (typeof value === 'object') return value;
+      if (!value) return null
+      if (typeof value === 'object') return value
       try {
-        return JSON.parse(value);
+        return JSON.parse(value)
       } catch (e) {
-        console.error("Failed to parse value:", value, e);
+        console.error('Failed to parse value:', value, e)
         return null
       }
     },
@@ -55,12 +55,12 @@ export default class Audit extends BaseModel {
 
   @column({
     consume: (value) => {
-      if (!value) return null;
-      if (typeof value === 'object') return value;
+      if (!value) return null
+      if (typeof value === 'object') return value
       try {
-        return JSON.parse(value);
+        return JSON.parse(value)
       } catch (e) {
-        console.error("Failed to parse value:", value, e);
+        console.error('Failed to parse value:', value, e)
         return null
       }
     },
