@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased]
+
+### Bug Fixes
+
+- tests: ensure event listeners use the Adonis emitter singleton to correctly capture audit events during tests
+- tests: fix Windows path handling for the Japa file-system plugin by avoiding absolute root duplication when creating directories
+- deps: update dev better-sqlite3 to ^12.2.0 to support Node 24 on Windows and avoid native module ABI mismatch
+
 ## [1.1.8](https://github.com/StouderIO/adonis-auditing/compare/v1.1.7...v1.1.8) (2024-09-07)
 
 ### Bug Fixes

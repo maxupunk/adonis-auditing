@@ -25,7 +25,8 @@ export async function setupApp() {
   if (!test) throw new Error('Cannot use "setupApp" outside of a Japa test')
 
   const { fs } = test.context
-  fs.mkdir(fs.basePath, { recursive: true })
+  // Ensure the plugin's root exists; use a relative path so it doesn't double-join on Windows
+  fs.mkdir('.', { recursive: true })
 
   const filename = stringHelpers.slug(test.options.title)
   const ignitor = new IgnitorFactory()
@@ -65,7 +66,8 @@ export async function setupApp() {
   await app.boot()
 
   const db = await app.container.make('lucid.db')
-  const emitter = await app.container.make('emitter')
+  // Use the same emitter singleton used by the auditable mixin to ensure event listeners match
+  const emitter = await import('@adonisjs/core/services/emitter').then((m) => m.default)
   const auditing = await app.container.make('auditing.manager')
 
   return { app, db, emitter, auditing }
