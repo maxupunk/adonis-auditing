@@ -18,7 +18,8 @@ export async function configure(command: ConfigureCommand) {
   })
 
   // add default resolvers
-  const path = command.app.makePath('app', 'audit_resolvers')
+  // Use a relative path segment to avoid passing absolute paths to app.makePath in stubs (fixes Windows file URL issue)
+  const path = 'app/audit_resolvers'
   await codemods.makeUsingStub(stubsRoot, 'resolvers/ip_address_resolver.stub', { path })
   await codemods.makeUsingStub(stubsRoot, 'resolvers/user_agent_resolver.stub', { path })
   await codemods.makeUsingStub(stubsRoot, 'resolvers/url_resolver.stub', { path })
