@@ -9,7 +9,6 @@ Audite seus modelos Lucid com facilidade no AdonisJS. Este pacote permite rastre
 - Correções de bugs relacionados à importação dinâmica de dependências
 - Melhorias na configuração e estabilidade do pacote
 - Atualizações de compatibilidade com versões mais recentes do AdonisJS
-- Correções em problemas de CI/CD
 
 ## 📦 Instalação
 
