@@ -54,11 +54,11 @@ const guidesNav = [
 const releasesNav = [
   {
     text: 'Changelog',
-    link: 'https://github.com/StouderIO/adonis-auditing/blob/main/CHANGELOG.md',
+    link: 'https://github.com/maxupunk/adonis-auditing/blob/main/CHANGELOG.md',
   },
   {
     text: 'Release Notes',
-    link: 'https://github.com/StouderIO/adonis-auditing/releases',
+    link: 'https://github.com/maxupunk/adonis-auditing/releases',
   }
 ]
 
@@ -97,7 +97,7 @@ export default defineConfig({
 
   themeConfig: {
     editLink: {
-      pattern: 'https://github.com/StouderIO/adonis-auditing/edit/main/docs/:path',
+      pattern: 'https://github.com/maxupunk/adonis-auditing/edit/main/docs/:path',
       text: 'Edit this page on GitHub',
     },
     nav: [
@@ -115,7 +115,7 @@ export default defineConfig({
       ]
     },
     socialLinks: [
-      {icon: 'github', link: 'https://github.com/StouderIO/adonis-auditing'}
+      {icon: 'github', link: 'https://github.com/maxupunk/adonis-auditing'}
     ]
   }
 })
