@@ -1,0 +1,6 @@
+-   Always follow best practices.
+-   Maintain the project's existing patterns and standards.
+-   Always check the types with `npm run typecheck`
+-   Always run the tests with `npm run test`
+-   Always update the documentation when necessary.
+-   Always update the changelog when necessary.
