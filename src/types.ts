@@ -21,6 +21,11 @@ export interface AuditingConfig {
    * (e.g. timestamps or derived columns like updatedAt)
    */
   ignoredFieldsOnUpdate?: string[]
+  /**
+   * List of attribute names that should be masked in audit payloads (oldValues/newValues)
+   * The stored value will be the string '******'.
+   */
+  hiddenFields?: string[]
 }
 
 export interface ResolvedAuditingConfig {
@@ -28,6 +33,7 @@ export interface ResolvedAuditingConfig {
   resolvers: Record<string, Resolver>
   fullSnapshotOnUpdate: boolean
   ignoredFieldsOnUpdate: string[]
+  hiddenFields: string[]
 }
 
 export interface AuditingService {
@@ -35,4 +41,5 @@ export interface AuditingService {
   getMetadataForContext(): Promise<Record<string, unknown>>
   isFullSnapshotOnUpdate(): boolean
   getIgnoredFieldsOnUpdate(): string[]
+  getHiddenFields(): string[]
 }

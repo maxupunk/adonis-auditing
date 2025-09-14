@@ -19,4 +19,9 @@ export default defineConfig({
   // If only ignored fields change, no audit is created for the update
   // Default: []
   // ignoredFieldsOnUpdate: ['updatedAt'],
+
+  // Hidden attributes to mask in persisted audits
+  // Values for these keys will be stored as '******' in oldValues/newValues for all events
+  // Default: []
+  // hiddenFields: ['password', 'token'],
 })

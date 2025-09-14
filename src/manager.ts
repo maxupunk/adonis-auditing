@@ -52,4 +52,8 @@ export default class AuditingManager implements AuditingService {
   getIgnoredFieldsOnUpdate(): string[] {
     return this.config.ignoredFieldsOnUpdate
   }
+
+  getHiddenFields(): string[] {
+    return this.config.hiddenFields
+  }
 }

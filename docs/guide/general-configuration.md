@@ -58,3 +58,24 @@ export default defineConfig({
 Default values:
 - `fullSnapshotOnUpdate`: `false`
 - `ignoredFieldsOnUpdate`: `[]`
+
+### hiddenFields
+Use `hiddenFields` to provide a list of attribute names whose values must be masked in the persisted audits. When a key is listed here, its value will be stored as the literal string "******" in `oldValues`/`newValues` for all events (create, update, delete). This helps prevent leaking sensitive information (e.g., passwords, tokens, secrets) while still preserving the audit trail structure.
+
+Example:
+```ts
+import { defineConfig } from 'adonis-auditing/setup'
+
+export default defineConfig({
+  userResolver: () => import('#audit_resolvers/user_resolver'),
+  resolvers: { /* ... */ },
+  hiddenFields: ['password', 'token'],
+})
+```
+
+Notes:
+- Masking happens after diff/snapshot computation. The set of keys included in each audit entry remains the same; only values for the listed keys are replaced by "******".
+- This option applies to `create`, `update` (both diff and full snapshot modes), and `delete` events.
+
+Default values:
+- `hiddenFields`: `[]`

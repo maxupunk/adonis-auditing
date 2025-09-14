@@ -371,4 +371,95 @@ test.group('BaseModel with auditable', () => {
     const last = await book.audits().last()
     assert.equal(last!.event, 'create')
   })
+
+  test('mask hiddenFields on create and delete', async ({ assert }) => {
+    const { db } = await setupApp({ auditing: { hiddenFields: ['id', 'name'] } })
+    await resetTables(db)
+
+    const { withAuditable } = await import('../src/auditable/factory.js')
+    const Auditable = withAuditable()
+    class Book extends compose(BaseModel, Auditable) {
+      @column()
+      declare id: number
+
+      @column()
+      declare name: string
+    }
+
+    const book = new Book()
+    book.name = 'The Hobbit'
+    await book.save()
+
+    const createAudit = await book.audits().first()
+    assert.deepEqual(createAudit!.newValues, { id: '******', name: '******' })
+
+    await book.delete()
+    const deleteAudit = await Audit.query()
+      .where('auditableType', 'Book')
+      .where('auditableId', book.id)
+      .orderBy('id', 'desc')
+      .firstOrFail()
+
+    assert.deepEqual(deleteAudit.oldValues, { id: '******', name: '******' })
+  })
+
+  test('mask hiddenFields on update diff', async ({ assert }) => {
+    const { db } = await setupApp({ auditing: { hiddenFields: ['name'] } })
+    await resetTables(db)
+
+    const { withAuditable } = await import('../src/auditable/factory.js')
+    const Auditable = withAuditable()
+    class Book extends compose(BaseModel, Auditable) {
+      @column()
+      declare id: number
+
+      @column()
+      declare name: string
+    }
+
+    const book = new Book()
+    book.name = 'The Hobbit'
+    await book.save()
+
+    book.name = 'The Lord of the Rings'
+    await book.save()
+
+    const audit = await book.audits().last()
+    assert.equal(audit!.event, 'update')
+    // Only changed field masked
+    assert.deepEqual(audit!.oldValues, { name: '******' })
+    assert.deepEqual(audit!.newValues, { name: '******' })
+  })
+
+  test('mask hiddenFields on update full snapshot', async ({ assert }) => {
+    const { db } = await setupApp({
+      auditing: {
+        fullSnapshotOnUpdate: true,
+        hiddenFields: ['name'],
+      },
+    })
+    await resetTables(db)
+
+    const { withAuditable } = await import('../src/auditable/factory.js')
+    const Auditable = withAuditable()
+    class Book extends compose(BaseModel, Auditable) {
+      @column()
+      declare id: number
+
+      @column()
+      declare name: string
+    }
+
+    const book = new Book()
+    book.name = 'The Hobbit'
+    await book.save()
+
+    book.name = 'The Lord of the Rings'
+    await book.save()
+
+    const audit = await book.audits().last()
+    assert.equal(audit!.event, 'update')
+    assert.deepEqual(audit!.oldValues, { id: book.id, name: '******' })
+    assert.deepEqual(audit!.newValues, { id: book.id, name: '******' })
+  })
 })

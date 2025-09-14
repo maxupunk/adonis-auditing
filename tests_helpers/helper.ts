@@ -24,6 +24,7 @@ interface SetupOverrides {
   auditing?: {
     fullSnapshotOnUpdate?: boolean
     ignoredFieldsOnUpdate?: string[]
+    hiddenFields?: string[]
   }
 }
 
@@ -58,6 +59,7 @@ export async function setupApp(overrides?: SetupOverrides) {
           },
           fullSnapshotOnUpdate: overrides?.auditing?.fullSnapshotOnUpdate,
           ignoredFieldsOnUpdate: overrides?.auditing?.ignoredFieldsOnUpdate,
+          hiddenFields: overrides?.auditing?.hiddenFields,
         }),
       },
       rcFileContents: {

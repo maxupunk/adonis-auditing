@@ -16,6 +16,7 @@ export function defineConfig(config: AuditingConfig): ConfigProvider<ResolvedAud
       resolvers: Object.fromEntries(resolversMap),
       fullSnapshotOnUpdate: config.fullSnapshotOnUpdate ?? false,
       ignoredFieldsOnUpdate: config.ignoredFieldsOnUpdate ?? [],
+      hiddenFields: config.hiddenFields ?? [],
     }
   })
 }

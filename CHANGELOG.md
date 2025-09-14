@@ -6,6 +6,7 @@
 
 - config: add fullSnapshotOnUpdate option to store full snapshots on update events
 - config: add ignoredFieldsOnUpdate option to ignore fields during update diffs
+- config: add hiddenFields option to mask sensitive fields in persisted audits
 
 ### Behavior Changes
 

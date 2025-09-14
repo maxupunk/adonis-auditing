@@ -102,14 +102,28 @@ export function withAuditable() {
         const auditedUser = await ModelWithAudit.innerAuditing.getUserForContext()
         const metadata = await ModelWithAudit.innerAuditing.getMetadataForContext()
 
+        // Helper to mask configured hidden fields
+        const hidden = new Set(ModelWithAudit.innerAuditing.getHiddenFields())
+        const MASK = '******'
+        const maskObject = (obj: ModelObject | null): ModelObject | null => {
+          if (!obj) return obj
+          const clone: ModelObject = { ...(obj as any) }
+          for (const key of Object.keys(clone)) {
+            if (hidden.has(key)) {
+              ;(clone as any)[key] = MASK
+            }
+          }
+          return clone
+        }
+
         // Compute diffs for update events and honor configuration
         let oldValues: ModelObject | null = null
         let newValues: ModelObject | null = null
         if (event === 'create') {
           oldValues = null
-          newValues = this.$attributes
+          newValues = maskObject(this.$attributes)
         } else if (event === 'delete') {
-          oldValues = this.$auditValuesToSave
+          oldValues = maskObject(this.$auditValuesToSave)
           newValues = null
         } else {
           // update
@@ -151,11 +165,11 @@ export function withAuditable() {
           }
 
           if (ModelWithAudit.innerAuditing.isFullSnapshotOnUpdate()) {
-            oldValues = beforeFull
-            newValues = after
+            oldValues = maskObject(beforeFull)
+            newValues = maskObject(after)
           } else {
-            oldValues = changedOld
-            newValues = changedNew
+            oldValues = maskObject(changedOld)
+            newValues = maskObject(changedNew)
           }
         }
 
