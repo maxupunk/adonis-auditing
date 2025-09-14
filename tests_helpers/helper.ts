@@ -20,7 +20,14 @@ class FooResolver implements Resolver {
   }
 }
 
-export async function setupApp() {
+interface SetupOverrides {
+  auditing?: {
+    fullSnapshotOnUpdate?: boolean
+    ignoredFieldsOnUpdate?: string[]
+  }
+}
+
+export async function setupApp(overrides?: SetupOverrides) {
   const test = getActiveTest()
   if (!test) throw new Error('Cannot use "setupApp" outside of a Japa test')
 
@@ -49,6 +56,8 @@ export async function setupApp() {
           resolvers: {
             foo: async () => ({ default: FooResolver }),
           },
+          fullSnapshotOnUpdate: overrides?.auditing?.fullSnapshotOnUpdate,
+          ignoredFieldsOnUpdate: overrides?.auditing?.ignoredFieldsOnUpdate,
         }),
       },
       rcFileContents: {

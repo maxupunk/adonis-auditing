@@ -9,5 +9,14 @@ export default defineConfig({
     ip_address: () => import('#audit_resolvers/ip_address_resolver'),
     user_agent: () => import('#audit_resolvers/user_agent_resolver'),
     url: () => import('#audit_resolvers/url_resolver'),
-  }
+  },
+  // Update events options
+  // When true, update events store full snapshots of all attributes in oldValues/newValues
+  // Default: false
+  // fullSnapshotOnUpdate: true,
+
+  // Attributes to ignore when computing diffs on updates
+  // If only ignored fields change, no audit is created for the update
+  // Default: []
+  // ignoredFieldsOnUpdate: ['updatedAt'],
 })

@@ -25,3 +25,8 @@ export default class Book extends compose(BaseModel, Auditable) {
   declare updatedAt: DateTime
 }
 ```
+
+## Ignored fields during updates
+If your model has fields that change frequently and should not trigger an audit (like `updatedAt`), configure them in `config/auditing.ts` using `ignoredFieldsOnUpdate`. When only ignored fields change, no audit will be created for that update. When non-ignored fields change, the ignored ones are excluded from the diff.
+
+See [General configuration > Update events options](/guide/general-configuration#update-events-options) for details.

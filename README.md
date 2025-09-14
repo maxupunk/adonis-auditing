@@ -9,6 +9,7 @@ Audite seus modelos Lucid com facilidade no AdonisJS. Este pacote permite rastre
 - Correções de bugs relacionados à importação dinâmica de dependências
 - Melhorias na configuração e estabilidade do pacote
 - Atualizações de compatibilidade com versões mais recentes do AdonisJS
+- Novas opções de auditoria em updates: `fullSnapshotOnUpdate` e `ignoredFieldsOnUpdate`
 
 ## 📦 Instalação
 
@@ -65,6 +66,34 @@ export default class Book extends compose(BaseModel, Auditable) {
 ```
 
 Após adicionar o mixin, todas as operações de criação, atualização e exclusão serão automaticamente auditadas.
+
+## ⚙️ Configurações de Update
+
+- fullSnapshotOnUpdate (booleano, padrão: false)
+  - Quando true, eventos de update armazenam snapshots completos do modelo em `oldValues` e `newValues` (inclui atributos não alterados como `id`).
+  - Quando false (padrão), apenas os atributos alterados são armazenados.
+
+- ignoredFieldsOnUpdate (string[]; padrão: [])
+  - Lista de atributos a serem ignorados no cálculo de diff de updates (ex.: `updatedAt`).
+  - Se apenas campos ignorados mudarem, nenhum audit é criado para o update.
+  - Quando campos não ignorados mudam, os ignorados não aparecem no diff.
+
+Exemplo de configuração:
+
+```ts
+import { defineConfig } from 'adonis-auditing/setup'
+
+export default defineConfig({
+  userResolver: () => import('#audit_resolvers/user_resolver'),
+  resolvers: {
+    ip_address: () => import('#audit_resolvers/ip_address_resolver'),
+    user_agent: () => import('#audit_resolvers/user_agent_resolver'),
+    url: () => import('#audit_resolvers/url_resolver'),
+  },
+  fullSnapshotOnUpdate: true,
+  ignoredFieldsOnUpdate: ['updatedAt']
+})
+```
 
 ## 📚 Documentação Completa
 

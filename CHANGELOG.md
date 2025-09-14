@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+### Features
+
+- config: add fullSnapshotOnUpdate option to store full snapshots on update events
+- config: add ignoredFieldsOnUpdate option to ignore fields during update diffs
+
+### Behavior Changes
+
+- updates: when only ignored fields change, no audit entry is created
+- updates: when fullSnapshotOnUpdate=true, oldValues/newValues include all attributes (including id)
+
 ### Bug Fixes
 
 - tests: ensure event listeners use the Adonis emitter singleton to correctly capture audit events during tests

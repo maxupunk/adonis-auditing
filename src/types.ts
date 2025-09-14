@@ -11,14 +11,28 @@ export interface Resolver {
 export interface AuditingConfig {
   userResolver: () => Promise<{ default: new () => UserResolver }>
   resolvers: Record<string, () => Promise<{ default: new () => Resolver }>>
+  /**
+   * When true, update events will store full snapshots (all attributes) in oldValues/newValues.
+   * When false (default), only the changed attributes are stored for updates.
+   */
+  fullSnapshotOnUpdate?: boolean
+  /**
+   * List of attribute names to ignore when computing changed fields on updates
+   * (e.g. timestamps or derived columns like updatedAt)
+   */
+  ignoredFieldsOnUpdate?: string[]
 }
 
 export interface ResolvedAuditingConfig {
   userResolver: UserResolver
   resolvers: Record<string, Resolver>
+  fullSnapshotOnUpdate: boolean
+  ignoredFieldsOnUpdate: string[]
 }
 
 export interface AuditingService {
   getUserForContext(): Promise<{ id: string; type: string } | null>
   getMetadataForContext(): Promise<Record<string, unknown>>
+  isFullSnapshotOnUpdate(): boolean
+  getIgnoredFieldsOnUpdate(): string[]
 }

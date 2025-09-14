@@ -44,4 +44,12 @@ export default class AuditingManager implements AuditingService {
         .filter((value) => value !== null) as [string, unknown][]
     )
   }
+
+  isFullSnapshotOnUpdate(): boolean {
+    return this.config.fullSnapshotOnUpdate
+  }
+
+  getIgnoredFieldsOnUpdate(): string[] {
+    return this.config.ignoredFieldsOnUpdate
+  }
 }

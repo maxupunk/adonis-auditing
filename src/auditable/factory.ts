@@ -102,14 +102,71 @@ export function withAuditable() {
         const auditedUser = await ModelWithAudit.innerAuditing.getUserForContext()
         const metadata = await ModelWithAudit.innerAuditing.getMetadataForContext()
 
+        // Compute diffs for update events and honor configuration
+        let oldValues: ModelObject | null = null
+        let newValues: ModelObject | null = null
+        if (event === 'create') {
+          oldValues = null
+          newValues = this.$attributes
+        } else if (event === 'delete') {
+          oldValues = this.$auditValuesToSave
+          newValues = null
+        } else {
+          // update
+          const ignored = new Set(ModelWithAudit.innerAuditing.getIgnoredFieldsOnUpdate())
+          // $auditValuesToSave points to $original, which in Lucid holds only original values for dirty fields.
+          const dirtyOriginal = this.$auditValuesToSave || {}
+          const after = this.$attributes || {}
+
+          // Reconstruct a full "before" snapshot by starting from the current attributes
+          // and overriding with the original values for keys that are dirty.
+          const beforeFull: ModelObject = { ...(after as any) }
+          for (const key of Object.keys(dirtyOriginal)) {
+            ;(beforeFull as any)[key] = (dirtyOriginal as any)[key]
+          }
+
+          const keys = new Set<string>([
+            ...Object.keys(beforeFull),
+            ...Object.keys(after as any),
+            ...Object.keys(dirtyOriginal as any),
+          ])
+          const changedOld: ModelObject = {}
+          const changedNew: ModelObject = {}
+
+          for (const key of keys) {
+            if (ignored.has(key)) continue
+            const beforeVal = (beforeFull as any)[key]
+            const afterVal = (after as any)[key]
+            // Use strict equality; for objects/arrays, shallow reference check
+            const equal = beforeVal === afterVal
+            if (!equal) {
+              changedOld[key] = beforeVal
+              changedNew[key] = afterVal
+            }
+          }
+
+          // If nothing changed (considering ignored fields), do not create audit
+          if (Object.keys(changedNew).length === 0) {
+            return
+          }
+
+          if (ModelWithAudit.innerAuditing.isFullSnapshotOnUpdate()) {
+            oldValues = beforeFull
+            newValues = after
+          } else {
+            oldValues = changedOld
+            newValues = changedNew
+          }
+        }
+
         const audit = new Audit()
         audit.userType = auditedUser?.type ?? null
         audit.userId = auditedUser?.id ?? null
         audit.event = event
         audit.auditableType = modelInstance.constructor.name
         audit.auditableId = (modelInstance as any).id
-        audit.oldValues = event === 'create' ? null : this.$auditValuesToSave
-        audit.newValues = event === 'delete' ? null : this.$attributes
+        audit.oldValues = oldValues
+        audit.newValues = newValues
         audit.metadata = metadata
         await audit.save()
 
@@ -123,9 +180,8 @@ export function withAuditable() {
         ModelWithAudit.innerEmitter = await import('@adonisjs/core/services/emitter').then(
           (m) => m.default
         )
-        ModelWithAudit.innerAuditing = await import('../../services/auditing.js').then(
-          (m) => m.default
-        )
+        const app = await import('@adonisjs/core/services/app').then((m) => m.default)
+        ModelWithAudit.innerAuditing = await app.container.make('auditing.manager')
       }
 
       @beforeCreate()

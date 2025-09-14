@@ -35,7 +35,7 @@ test.group('BaseModel with auditable', () => {
     assert.deepEqual(audit!.newValues, { id: book.id, name: 'The Hobbit' })
   })
 
-  test('update event', async ({ assert }) => {
+  test('update event (diff by default)', async ({ assert }) => {
     const { db } = await setupApp()
     await resetTables(db)
 
@@ -64,8 +64,9 @@ test.group('BaseModel with auditable', () => {
     assert.equal(audit!.event, 'update')
     assert.equal(audit!.auditableType, 'Book')
     assert.equal(audit!.auditableId, book.id)
-    assert.deepEqual(audit!.newValues, { id: book.id, name: 'The Lord of the Rings' })
-    assert.deepEqual(audit!.oldValues, { id: book.id, name: 'The Hobbit' })
+    // Expect only changed fields by default
+    assert.deepEqual(audit!.newValues, { name: 'The Lord of the Rings' })
+    assert.deepEqual(audit!.oldValues, { name: 'The Hobbit' })
   })
 
   test('delete event', async ({ assert }) => {
@@ -288,5 +289,86 @@ test.group('BaseModel with auditable', () => {
 
     await book.revert()
     assert.equal(book.name, 'The Hobbit')
+  })
+
+  test('do not create audit when only ignored fields change', async ({ assert }) => {
+    const { db } = await setupApp({ auditing: { ignoredFieldsOnUpdate: ['name'] } })
+    await resetTables(db)
+
+    const { withAuditable } = await import('../src/auditable/factory.js')
+    const Auditable = withAuditable()
+    class Book extends compose(BaseModel, Auditable) {
+      @column()
+      declare id: number
+
+      @column()
+      declare name: string
+    }
+
+    const book = new Book()
+    book.name = 'The Hobbit'
+    await book.save()
+
+    // This changes only an ignored field
+    book.name = 'The Lord of the Rings'
+    await book.save()
+
+    const audits = await book.audits()
+    assert.lengthOf(audits, 1)
+    const last = await book.audits().last()
+    assert.equal(last!.event, 'create')
+  })
+
+  test('full snapshot on update when enabled', async ({ assert }) => {
+    const { db } = await setupApp({ auditing: { fullSnapshotOnUpdate: true } })
+    await resetTables(db)
+
+    const { withAuditable } = await import('../src/auditable/factory.js')
+    const Auditable = withAuditable()
+    class Book extends compose(BaseModel, Auditable) {
+      @column()
+      declare id: number
+
+      @column()
+      declare name: string
+    }
+
+    const book = new Book()
+    book.name = 'The Hobbit'
+    await book.save()
+
+    book.name = 'The Lord of the Rings'
+    await book.save()
+
+    const audit = await book.audits().last()
+    assert.equal(audit!.event, 'update')
+    assert.deepEqual(audit!.oldValues, { id: book.id, name: 'The Hobbit' })
+    assert.deepEqual(audit!.newValues, { id: book.id, name: 'The Lord of the Rings' })
+  })
+  test('do not create audit when no fields changed', async ({ assert }) => {
+    const { db } = await setupApp()
+    await resetTables(db)
+
+    const { withAuditable } = await import('../src/auditable/factory.js')
+    const Auditable = withAuditable()
+    class Book extends compose(BaseModel, Auditable) {
+      @column()
+      declare id: number
+
+      @column()
+      declare name: string
+    }
+
+    const book = new Book()
+    book.name = 'The Hobbit'
+    await book.save()
+
+    // Call save again without any changes
+    await book.save()
+
+    const audits = await book.audits()
+    assert.lengthOf(audits, 1)
+    const last = await book.audits().last()
+    assert.equal(last!.event, 'create')
   })
 })
