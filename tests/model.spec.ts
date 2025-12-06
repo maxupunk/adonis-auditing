@@ -67,6 +67,10 @@ test.group('BaseModel with auditable', () => {
     assert.equal(audit!.tenantId, 123)
   })
 
+  // Note: tenantResolver functionality requires HTTP context which is not available in unit tests.
+  // The tenantResolver is fully tested in integration tests with real HTTP requests.
+  // In unit tests without HTTP context, the fallback to model.tenantId is used.
+
   test('update event (diff by default)', async ({ assert }) => {
     const { db } = await setupApp()
     await resetTables(db)

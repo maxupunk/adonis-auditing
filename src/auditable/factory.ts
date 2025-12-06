@@ -101,6 +101,7 @@ export function withAuditable() {
         await ModelWithAudit.#init()
         const auditedUser = await ModelWithAudit.innerAuditing.getUserForContext()
         const metadata = await ModelWithAudit.innerAuditing.getMetadataForContext()
+        const tenantId = await ModelWithAudit.innerAuditing.getTenantIdForContext()
 
         // Helper to mask configured hidden fields
         const hidden = new Set(ModelWithAudit.innerAuditing.getHiddenFields())
@@ -182,10 +183,14 @@ export function withAuditable() {
         audit.oldValues = oldValues
         audit.newValues = newValues
         audit.metadata = metadata
-        // Multitenancy support: copy tenantId from audited model when available
-        if ('tenantId' in modelInstance && (modelInstance as any).tenantId !== undefined) {
-          ;(audit as any).tenantId = (modelInstance as any).tenantId
+
+        // Multitenancy support: use tenantResolver first, fallback to model's tenantId
+        if (tenantId !== null) {
+          audit.tenantId = tenantId as number
+        } else if ('tenantId' in modelInstance && (modelInstance as any).tenantId !== undefined) {
+          audit.tenantId = (modelInstance as any).tenantId
         }
+
         await audit.save()
 
         await ModelWithAudit.innerEmitter.emit(`audit:${event}`, audit.id)

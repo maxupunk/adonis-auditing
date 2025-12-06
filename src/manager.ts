@@ -18,6 +18,21 @@ export default class AuditingManager implements AuditingService {
     return this.config.userResolver.resolve(ctx)
   }
 
+  async getTenantIdForContext(): Promise<number | string | null> {
+    if (!this.config.tenantResolver) {
+      return null
+    }
+
+    const ctx = HttpContext.get()
+    if (!ctx) {
+      this.logger.warn('Cannot get current context, did you forget to enable asyncLocalStorage?')
+      return null
+    }
+
+    const result = await this.config.tenantResolver.resolve(ctx)
+    return result?.id ?? null
+  }
+
   async getMetadataForContext(): Promise<Record<string, unknown>> {
     const ctx = HttpContext.get()
     if (!ctx) {

@@ -91,13 +91,72 @@ export default defineConfig({
     url: () => import('#audit_resolvers/url_resolver'),
   },
   fullSnapshotOnUpdate: true,
-  ignoredFieldsOnUpdate: ['updatedAt']
+  ignoredFieldsOnUpdate: ['updatedAt'],
 })
 ```
 
 ## 🏢 Multitenancy
 
-Se seus modelos possuem `tenantId` (por exemplo, modelos que herdam de `TenantBaseModel`), o pacote copia automaticamente este valor para os registros de `Audit`. Para habilitar, adicione a coluna `tenant_id` na tabela `audits` via migration:
+O pacote oferece suporte completo a multitenancy com duas formas de capturar o `tenantId`:
+
+### 1. TenantResolver (Recomendado)
+
+O `tenantResolver` permite capturar o `tenantId` diretamente do contexto HTTP (por exemplo, do usuário autenticado):
+
+```ts
+// config/auditing.ts
+import { defineConfig } from 'adonis-auditing'
+
+export default defineConfig({
+  userResolver: () => import('#audit_resolvers/user_resolver'),
+  tenantResolver: () => import('#audit_resolvers/tenant_resolver'), // Adicione esta linha
+  resolvers: {
+    ip_address: () => import('#audit_resolvers/ip_address_resolver'),
+    user_agent: () => import('#audit_resolvers/user_agent_resolver'),
+    url: () => import('#audit_resolvers/url_resolver'),
+  },
+})
+```
+
+Crie o resolver de tenant:
+
+```ts
+// app/audit_resolvers/tenant_resolver.ts
+import { HttpContext } from '@adonisjs/core/http'
+import { TenantResolver } from 'adonis-auditing'
+
+export default class implements TenantResolver {
+  async resolve({ auth }: HttpContext): Promise<{ id: number | string } | null> {
+    // Ajuste conforme a estrutura do seu modelo de usuário
+    const user = auth.user as { tenantId?: number } | undefined
+    return user?.tenantId ? { id: user.tenantId } : null
+  }
+}
+```
+
+### 2. Fallback: TenantId do Modelo
+
+Se o `tenantResolver` não estiver configurado, o pacote copia automaticamente o `tenantId` da instância do modelo (se existir):
+
+```ts
+// O campo tenantId do modelo será copiado para o audit
+class Book extends compose(BaseModel, Auditable) {
+  @column()
+  declare id: number
+
+  @column()
+  declare tenantId: number // Será copiado para o audit automaticamente
+}
+```
+
+### Prioridade
+
+1. **tenantResolver**: Se configurado, sempre tem prioridade
+2. **model.tenantId**: Usado como fallback se o tenantResolver não estiver configurado ou retornar null
+
+### Migration
+
+Se estiver atualizando de uma versão anterior, adicione a coluna `tenant_id`:
 
 ```ts
 // Migration de exemplo
@@ -105,10 +164,6 @@ this.schema.alterTable('audits', (table) => {
   table.integer('tenant_id').nullable()
 })
 ```
-
-Observações:
-- O campo `tenantId` não precisa necessariamente ser persistido na tabela do modelo; ele pode existir apenas na instância para ser copiado para o audit.
-- Se optar por persistir `tenantId` no modelo, lembre-se de criar a coluna correspondente na tabela do modelo.
 
 ## 📚 Documentação Completa
 

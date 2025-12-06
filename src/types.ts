@@ -4,12 +4,25 @@ export interface UserResolver {
   resolve(ctx: HttpContext): Promise<{ id: string; type: string } | null>
 }
 
+/**
+ * Interface for resolving the tenant ID from the HTTP context.
+ * Implement this to capture multitenancy information in audit records.
+ */
+export interface TenantResolver {
+  resolve(ctx: HttpContext): Promise<{ id: number | string } | null>
+}
+
 export interface Resolver {
   resolve(ctx: HttpContext): Promise<unknown>
 }
 
 export interface AuditingConfig {
   userResolver: () => Promise<{ default: new () => UserResolver }>
+  /**
+   * Optional tenant resolver for multitenancy support.
+   * When configured, the resolved tenant ID is stored in the tenant_id column.
+   */
+  tenantResolver?: () => Promise<{ default: new () => TenantResolver }>
   resolvers: Record<string, () => Promise<{ default: new () => Resolver }>>
   /**
    * When true, update events will store full snapshots (all attributes) in oldValues/newValues.
@@ -30,6 +43,7 @@ export interface AuditingConfig {
 
 export interface ResolvedAuditingConfig {
   userResolver: UserResolver
+  tenantResolver: TenantResolver | null
   resolvers: Record<string, Resolver>
   fullSnapshotOnUpdate: boolean
   ignoredFieldsOnUpdate: string[]
@@ -38,6 +52,7 @@ export interface ResolvedAuditingConfig {
 
 export interface AuditingService {
   getUserForContext(): Promise<{ id: string; type: string } | null>
+  getTenantIdForContext(): Promise<number | string | null>
   getMetadataForContext(): Promise<Record<string, unknown>>
   isFullSnapshotOnUpdate(): boolean
   getIgnoredFieldsOnUpdate(): string[]

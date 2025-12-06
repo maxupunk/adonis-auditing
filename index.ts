@@ -1,5 +1,5 @@
 export * as errors from './src/errors.js'
-export type { Resolver, UserResolver } from './src/types.js'
+export type { Resolver, UserResolver, TenantResolver } from './src/types.js'
 export { default as Auditable } from './src/auditable/mixin.js'
 export { configure } from './configure.js'
 export { defineConfig } from './src/define_config.js'

@@ -5,6 +5,11 @@ import { defineConfig } from 'adonis-auditing'
 
 export default defineConfig({
   userResolver: () => import('#audit_resolvers/user_resolver'),
+
+  // Multitenancy support
+  // Uncomment and configure to capture tenant ID in audit records
+  // tenantResolver: () => import('#audit_resolvers/tenant_resolver'),
+
   resolvers: {
     ip_address: () => import('#audit_resolvers/ip_address_resolver'),
     user_agent: () => import('#audit_resolvers/user_agent_resolver'),
@@ -25,3 +30,4 @@ export default defineConfig({
   // Default: []
   // hiddenFields: ['password', 'token'],
 })
+

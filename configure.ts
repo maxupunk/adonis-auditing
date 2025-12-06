@@ -24,6 +24,7 @@ export async function configure(command: ConfigureCommand) {
   await codemods.makeUsingStub(stubsRoot, 'resolvers/user_agent_resolver.stub', { path })
   await codemods.makeUsingStub(stubsRoot, 'resolvers/url_resolver.stub', { path })
   await codemods.makeUsingStub(stubsRoot, 'resolvers/user_resolver.stub', { path })
+  await codemods.makeUsingStub(stubsRoot, 'resolvers/tenant_resolver.stub', { path })
 
   // add imports
   const packageJsonPath = command.app.makePath('package.json')

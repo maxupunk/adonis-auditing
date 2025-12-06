@@ -5,12 +5,19 @@ import { IgnitorFactory } from '@adonisjs/core/factories'
 import { defineConfig as defineLucidConfig } from '@adonisjs/lucid'
 import { defineConfig } from '../src/define_config.js'
 
-import { UserResolver, Resolver } from '../src/types.js'
+import { UserResolver, TenantResolver, Resolver } from '../src/types.js'
 import stringHelpers from '@adonisjs/core/helpers/string'
 
 class FakeUserResolver implements UserResolver {
   async resolve() {
     return { id: '1', type: 'User' }
+  }
+}
+
+class FakeTenantResolver implements TenantResolver {
+  constructor(private tenantId: number | string | null) {}
+  async resolve() {
+    return this.tenantId ? { id: this.tenantId } : null
   }
 }
 
@@ -25,6 +32,7 @@ interface SetupOverrides {
     fullSnapshotOnUpdate?: boolean
     ignoredFieldsOnUpdate?: string[]
     hiddenFields?: string[]
+    tenantId?: number | string | null
   }
 }
 
@@ -37,6 +45,19 @@ export async function setupApp(overrides?: SetupOverrides) {
   fs.mkdir('.', { recursive: true })
 
   const filename = stringHelpers.slug(test.options.title)
+
+  // Create tenantResolver factory if tenantId is provided
+  const tenantResolverConfig =
+    overrides?.auditing?.tenantId !== undefined
+      ? async () => ({
+          default: class extends FakeTenantResolver {
+            constructor() {
+              super(overrides!.auditing!.tenantId!)
+            }
+          },
+        })
+      : undefined
+
   const ignitor = new IgnitorFactory()
     .withCoreProviders()
     .withCoreConfig()
@@ -54,6 +75,7 @@ export async function setupApp(overrides?: SetupOverrides) {
         }),
         auditing: defineConfig({
           userResolver: async () => ({ default: FakeUserResolver }),
+          tenantResolver: tenantResolverConfig,
           resolvers: {
             foo: async () => ({ default: FooResolver }),
           },
