@@ -35,6 +35,38 @@ test.group('BaseModel with auditable', () => {
     assert.deepEqual(audit!.newValues, { id: book.id, name: 'The Hobbit' })
   })
 
+  test('propaga tenantId para audit quando presente', async ({ assert }) => {
+    const { db } = await setupApp()
+    await resetTables(db)
+
+    const { withAuditable } = await import('../src/auditable/factory.js')
+    const Auditable = withAuditable()
+
+    class TenantScopedBook extends compose(BaseModel, Auditable) {
+      static table = 'books'
+      @column()
+      declare id: number
+
+      @column()
+      declare name: string
+
+      // Campo não persistido; usado apenas para copiar no audit
+      declare tenantId: number
+    }
+
+    const book = new TenantScopedBook()
+    book.name = 'The Hobbit'
+    book.tenantId = 123
+    await book.save()
+
+    const audit = await book.audits().first()
+    assert.isNotNull(audit)
+    assert.equal(audit!.event, 'create')
+    assert.equal(audit!.auditableType, 'TenantScopedBook')
+    assert.equal(audit!.auditableId, book.id)
+    assert.equal(audit!.tenantId, 123)
+  })
+
   test('update event (diff by default)', async ({ assert }) => {
     const { db } = await setupApp()
     await resetTables(db)

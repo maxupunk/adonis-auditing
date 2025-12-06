@@ -69,6 +69,9 @@ export default class Audit extends BaseModel {
   })
   declare metadata: ModelObject | null
 
+  @column()
+  declare tenantId: number | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

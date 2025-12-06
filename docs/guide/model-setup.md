@@ -30,3 +30,19 @@ export default class Book extends compose(BaseModel, Auditable) {
 If your model has fields that change frequently and should not trigger an audit (like `updatedAt`), configure them in `config/auditing.ts` using `ignoredFieldsOnUpdate`. When only ignored fields change, no audit will be created for that update. When non-ignored fields change, the ignored ones are excluded from the diff.
 
 See [General configuration > Update events options](/guide/general-configuration#update-events-options) for details.
+
+## Multitenancy
+If your model tracks multitenancy using a `tenantId` property (for example, models extending a `TenantBaseModel`), the auditing system will automatically copy `tenantId` from the model instance to the `Audit` record.
+
+To enable this, make sure your `audits` table has a `tenant_id` column:
+
+```ts
+// migration example
+this.schema.alterTable('audits', (table) => {
+  table.integer('tenant_id').nullable()
+})
+```
+
+Notes:
+- You do not need to persist `tenantId` on the audited model for the copy to happen; a non-persisted property on the instance is sufficient.
+- If you do persist `tenantId` on your model, remember to add the corresponding column on the model's table as well.

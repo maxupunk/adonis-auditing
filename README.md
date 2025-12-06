@@ -95,6 +95,21 @@ export default defineConfig({
 })
 ```
 
+## 🏢 Multitenancy
+
+Se seus modelos possuem `tenantId` (por exemplo, modelos que herdam de `TenantBaseModel`), o pacote copia automaticamente este valor para os registros de `Audit`. Para habilitar, adicione a coluna `tenant_id` na tabela `audits` via migration:
+
+```ts
+// Migration de exemplo
+this.schema.alterTable('audits', (table) => {
+  table.integer('tenant_id').nullable()
+})
+```
+
+Observações:
+- O campo `tenantId` não precisa necessariamente ser persistido na tabela do modelo; ele pode existir apenas na instância para ser copiado para o audit.
+- Se optar por persistir `tenantId` no modelo, lembre-se de criar a coluna correspondente na tabela do modelo.
+
 ## 📚 Documentação Completa
 
 Para documentação detalhada, configurações avançadas, resolvers personalizados e mais exemplos, acesse a pasta **`docs/`** deste repositório ou consulte os seguintes guias:

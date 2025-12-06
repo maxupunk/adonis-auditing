@@ -119,6 +119,9 @@ export async function resetTables(db: Database) {
     table.text('user_type').nullable()
     table.integer('user_id').nullable()
 
+    // Multitenancy support
+    table.integer('tenant_id').nullable()
+
     table.text('event').notNullable()
 
     table.text('auditable_type').notNullable()

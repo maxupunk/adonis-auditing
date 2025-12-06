@@ -7,11 +7,18 @@
 - config: add fullSnapshotOnUpdate option to store full snapshots on update events
 - config: add ignoredFieldsOnUpdate option to ignore fields during update diffs
 - config: add hiddenFields option to mask sensitive fields in persisted audits
+- multitenancy: automatically copy `tenantId` from audited models into `Audit`
 
 ### Behavior Changes
 
 - updates: when only ignored fields change, no audit entry is created
 - updates: when fullSnapshotOnUpdate=true, oldValues/newValues include all attributes (including id)
+
+### Breaking Changes
+
+- audits table: requires adding nullable `tenant_id` column to support multitenancy
+  - Run a new migration to add `tenant_id` to `audits`.
+  - Provided `stubs/migration.stub` updated accordingly.
 
 ### Bug Fixes
 

@@ -28,5 +28,6 @@ The `Audit` model is a Lucid model that represents the audit table. It has the f
 - `oldValues`: The old values of the audited model.
 - `newValues`: The new values of the audited model.
 - `metadata`: Resolved metadata.
+- `tenantId`: Tenant identifier when the audited model has `tenantId`.
 - `createdAt`: The date and time when the audit was created.
 - `updatedAt`: The date and time when the audit was last updated.

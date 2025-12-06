@@ -182,6 +182,10 @@ export function withAuditable() {
         audit.oldValues = oldValues
         audit.newValues = newValues
         audit.metadata = metadata
+        // Multitenancy support: copy tenantId from audited model when available
+        if ('tenantId' in modelInstance && (modelInstance as any).tenantId !== undefined) {
+          ;(audit as any).tenantId = (modelInstance as any).tenantId
+        }
         await audit.save()
 
         await ModelWithAudit.innerEmitter.emit(`audit:${event}`, audit.id)

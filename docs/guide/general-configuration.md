@@ -79,3 +79,15 @@ Notes:
 
 Default values:
 - `hiddenFields`: `[]`
+
+## Multitenancy
+The auditing package supports multitenancy by copying a `tenantId` property from audited model instances into the `Audit` entries when present. To make use of this feature, ensure your `audits` table includes a nullable `tenant_id` column.
+
+Example migration:
+```ts
+this.schema.alterTable('audits', (table) => {
+  table.integer('tenant_id').nullable()
+})
+```
+
+This is especially useful in setups where models inherit from a base class (e.g. `TenantBaseModel`) or otherwise expose a `tenantId`. No extra configuration is required in the package.
