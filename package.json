@@ -1,7 +1,7 @@
 {
   "name": "adonis-auditing",
   "description": "Audit your Lucid models with ease.",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "type": "module",
   "files": [
     "build"
