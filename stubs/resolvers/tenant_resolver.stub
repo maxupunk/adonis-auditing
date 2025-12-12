@@ -1,5 +1,5 @@
 {{{
-  exports({ to: app.makePath(path, 'tenant_resolver.ts') })
+  exports({ to: path + '/tenant_resolver.ts' })
 }}}
 import { HttpContext } from '@adonisjs/core/http'
 import { TenantResolver } from 'adonis-auditing'
