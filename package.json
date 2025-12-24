@@ -50,7 +50,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/maxupunk/adonis-auditing.git"
+    "url": "git+https://github.com/maxupunk/adonis-auditing.git"
   },
   "bugs": {
     "url": "https://github.com/maxupunk/adonis-auditing/issues"
@@ -63,7 +63,7 @@
     "@adonisjs/lucid": "^20.3.0",
     "@adonisjs/prettier-config": "^1.2.2",
     "@adonisjs/tsconfig": "^1.2.2",
-    "@japa/assert": "^2.1.0",
+    "@japa/assert": "^4.2.0",
     "@japa/file-system": "^2.2.0",
     "@japa/runner": "^3.1.1",
     "@swc/core": "^1.4.2",
@@ -79,7 +79,7 @@
     "ts-node": "^10.9.2",
     "tsup": "^8.0.2",
     "typescript": "^5.3.3",
-    "vitepress": "1.0.0-rc.45"
+    "vitepress": "^1.6.4"
   },
   "peerDependencies": {
     "@adonisjs/auth": "^9.1.1",
