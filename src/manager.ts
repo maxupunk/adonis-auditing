@@ -1,17 +1,28 @@
 import { AuditingService, ResolvedAuditingConfig } from './types.js'
 import { HttpContext } from '@adonisjs/core/http'
-import { LoggerService } from '@adonisjs/core/types'
+import { ApplicationService, LoggerService } from '@adonisjs/core/types'
 
 export default class AuditingManager implements AuditingService {
   constructor(
     protected config: ResolvedAuditingConfig,
-    protected logger: LoggerService
+    protected logger: LoggerService,
+    protected app: ApplicationService
   ) {}
+
+  /**
+   * Check if the application is running in web environment.
+   * Warnings are only logged in web environment to avoid noise in console/CLI commands.
+   */
+  protected isWebEnvironment(): boolean {
+    return this.app.getEnvironment() === 'web'
+  }
 
   async getUserForContext(): Promise<{ id: string; type: string } | null> {
     const ctx = HttpContext.get()
     if (!ctx) {
-      this.logger.warn('Cannot get current context, did you forget to enable asyncLocalStorage?')
+      if (this.isWebEnvironment()) {
+        this.logger.warn('Cannot get current context, did you forget to enable asyncLocalStorage?')
+      }
       return null
     }
 
@@ -25,7 +36,9 @@ export default class AuditingManager implements AuditingService {
 
     const ctx = HttpContext.get()
     if (!ctx) {
-      this.logger.warn('Cannot get current context, did you forget to enable asyncLocalStorage?')
+      if (this.isWebEnvironment()) {
+        this.logger.warn('Cannot get current context, did you forget to enable asyncLocalStorage?')
+      }
       return null
     }
 
@@ -36,7 +49,9 @@ export default class AuditingManager implements AuditingService {
   async getMetadataForContext(): Promise<Record<string, unknown>> {
     const ctx = HttpContext.get()
     if (!ctx) {
-      this.logger.warn('Cannot get current context, did you forget to enable asyncLocalStorage?')
+      if (this.isWebEnvironment()) {
+        this.logger.warn('Cannot get current context, did you forget to enable asyncLocalStorage?')
+      }
       return {}
     }
 

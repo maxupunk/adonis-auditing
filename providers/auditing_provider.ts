@@ -26,7 +26,7 @@ export default class AuditingProvider {
 
       const logger = await this.app.container.make('logger')
 
-      return new AuditingManager(config, logger)
+      return new AuditingManager(config, logger, this.app)
     })
   }
 }
