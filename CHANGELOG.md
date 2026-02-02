@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.2.6](https://github.com/maxupunk/adonis-auditing/compare/v1.2.5...v1.2.6) (2026-02-02)
+
 ### Features
 
 - config: add fullSnapshotOnUpdate option to store full snapshots on update events
