@@ -67,6 +67,31 @@ export default class Book extends compose(BaseModel, Auditable) {
 
 Após adicionar o mixin, todas as operações de criação, atualização e exclusão serão automaticamente auditadas.
 
+## 🔒 Campos Ocultos (Hidden Fields)
+
+Você pode configurar campos sensíveis que devem ser ocultados nos registros de auditoria (por exemplo, senhas, tokens). O valor original será substituído por `******`. Esta configuração é global e se aplica a todos os modelos auditados.
+
+Essa configuração deve ser feita no arquivo **`config/auditing.ts`**, que é criado automaticamente após a instalação do pacote.
+
+- `hiddenFields` (string[]; padrão: []): Lista de atributos a serem mascarados nos objetos `oldValues` e `newValues`.
+
+Exemplo de configuração no arquivo `config/auditing.ts`:
+
+```ts
+import { defineConfig } from 'adonis-auditing/setup'
+
+export default defineConfig({
+  userResolver: () => import('#audit_resolvers/user_resolver'),
+  resolvers: {
+    ip_address: () => import('#audit_resolvers/ip_address_resolver'),
+    user_agent: () => import('#audit_resolvers/user_agent_resolver'),
+    url: () => import('#audit_resolvers/url_resolver'),
+  },
+  // Adicione os campos que deseja ocultar aqui
+  hiddenFields: ['password', 'token', 'secret'],
+})
+```
+
 ## ⚙️ Configurações de Update
 
 - fullSnapshotOnUpdate (booleano, padrão: false)
