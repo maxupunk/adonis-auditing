@@ -94,7 +94,6 @@ export async function setupApp(overrides?: SetupOverrides) {
     .create(fs.baseUrl)
 
   const app = ignitor.createApp('web')
-  test.cleanup(() => app.terminate())
   await app.init()
   await app.boot()
 
@@ -102,6 +101,11 @@ export async function setupApp(overrides?: SetupOverrides) {
   // Use the same emitter singleton used by the auditable mixin to ensure event listeners match
   const emitter = await import('@adonisjs/core/services/emitter').then((m) => m.default)
   const auditing = await app.container.make('auditing.manager')
+
+  test.cleanup(async () => {
+    await db.manager.closeAll()
+    await app.terminate()
+  })
 
   return { app, db, emitter, auditing }
 }
