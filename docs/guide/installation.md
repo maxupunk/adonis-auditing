@@ -1,5 +1,7 @@
 # Installation
 
+Compatible with AdonisJS v7 (Core 7, Auth 10, and Lucid 22). For AdonisJS v6, use tag adonis6 (1.x.x).
+
 The Adonis Auditing package is available on [npm](https://www.npmjs.com/package/adonis-auditing). 
 You can install it using the following ace command to automagically configure it:
 ```sh
@@ -22,3 +24,10 @@ yarn add adonis-auditing
 node ace configure adonis-auditing
 ```
 :::
+
+For AdonisJS v6:
+
+```sh
+npm install adonis-auditing@adonis6
+node ace configure adonis-auditing
+```

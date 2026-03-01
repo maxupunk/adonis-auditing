@@ -1,6 +1,6 @@
-import type { AuditingConfig, ResolvedAuditingConfig } from './types.js'
-import { ConfigProvider } from '@adonisjs/core/types'
 import { configProvider } from '@adonisjs/core'
+import type { ConfigProvider } from '@adonisjs/core/types'
+import type { AuditingConfig, ResolvedAuditingConfig } from './types.js'
 
 export function defineConfig(config: AuditingConfig): ConfigProvider<ResolvedAuditingConfig> {
   return configProvider.create(async (_app) => {

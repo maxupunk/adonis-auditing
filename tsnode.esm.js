@@ -1,18 +1,17 @@
 /*
 |--------------------------------------------------------------------------
-| TS-Node ESM hook
+| TS-Exec ESM hook
 |--------------------------------------------------------------------------
 |
 | Importing this file before any other file will allow you to run TypeScript
-| code directly using TS-Node + SWC. For example
+| code directly using TS-Exec. For example
 |
 | node --import="./tsnode.esm.js" bin/test.ts
 | node --import="./tsnode.esm.js" audit.ts
 |
 |
-| Why not use "--loader=ts-node/esm"?
+| Why not use "--loader"?
 | Because, loaders have been deprecated.
 */
 
-import { register } from 'node:module'
-register('ts-node/esm', import.meta.url)
+import '@poppinss/ts-exec'

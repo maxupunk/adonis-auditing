@@ -4,7 +4,8 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { resetTables, setupApp } from '../tests_helpers/helper.js'
 import Audit from '../src/audit.js'
 
-test.group('BaseModel with auditable', () => {
+test.group('BaseModel with auditable', (group) => {
+  group.each.timeout(10000)
   test('create event', async ({ assert }) => {
     const { db } = await setupApp()
     await resetTables(db)

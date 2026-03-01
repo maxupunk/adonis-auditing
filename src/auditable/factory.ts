@@ -1,9 +1,7 @@
-import { EmitterService } from '@adonisjs/core/types'
 import {
   afterCreate,
   afterDelete,
   afterUpdate,
-  BaseModel,
   beforeCreate,
   beforeDelete,
   beforeUpdate,
@@ -16,9 +14,11 @@ import {
   E_AUDITABLE_WRONG_INSTANCE,
   E_AUDITABLE_WRONG_TYPE,
 } from '../errors.js'
-import { ModelObject } from '@adonisjs/lucid/types/model'
-import { NormalizeConstructor } from '../utils/normalized_constructor.js'
-import { EventType } from './events.js'
+import type { EmitterService } from '@adonisjs/core/types'
+import type { BaseModel } from '@adonisjs/lucid/orm'
+import type { ModelObject } from '@adonisjs/lucid/types/model'
+import type { NormalizeConstructor } from '../utils/normalized_constructor.js'
+import type { EventType } from './events.js'
 import type { AuditingService } from '../types.js'
 
 export interface AuditsCursor extends Promise<Audit[]> {

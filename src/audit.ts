@@ -1,6 +1,6 @@
-import { DateTime } from 'luxon'
 import { BaseModel, column } from '@adonisjs/lucid/orm'
-import { ModelObject } from '@adonisjs/lucid/types/model'
+import type { DateTime } from 'luxon'
+import type { ModelObject } from '@adonisjs/lucid/types/model'
 
 export default class Audit extends BaseModel {
   @column({ isPrimary: true })

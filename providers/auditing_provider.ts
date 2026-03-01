@@ -1,9 +1,8 @@
-import { ApplicationService } from '@adonisjs/core/types'
-import { RuntimeException } from '@poppinss/utils'
-
-import { AuditingConfig, AuditingService, ResolvedAuditingConfig } from '../src/types.js'
+import { RuntimeException } from '@adonisjs/core/exceptions'
 import { configProvider } from '@adonisjs/core'
 import AuditingManager from '../src/manager.js'
+import type { ApplicationService } from '@adonisjs/core/types'
+import type { AuditingConfig, AuditingService, ResolvedAuditingConfig } from '../src/types.js'
 
 declare module '@adonisjs/core/types' {
   export interface ContainerBindings {

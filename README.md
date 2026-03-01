@@ -11,6 +11,15 @@ Audite seus modelos Lucid com facilidade no AdonisJS. Este pacote permite rastre
 - Atualizações de compatibilidade com versões mais recentes do AdonisJS
 - Novas opções de auditoria em updates: `fullSnapshotOnUpdate` e `ignoredFieldsOnUpdate`
 
+## ✅ Compatibilidade
+
+Compatível com AdonisJS v7 (Core 7, Auth 10 e Lucid 22).
+
+## 🧩 Versões e Tags
+
+- AdonisJS v7: use a série 2.x.x (tag padrão)
+- AdonisJS v6: use a tag adonis6 (série 1.x.x)
+
 ## 📦 Instalação
 
 Você pode instalar o pacote usando o comando ace do AdonisJS para configuração automática:
@@ -32,6 +41,14 @@ node ace configure adonis-auditing
 
 # yarn
 yarn add adonis-auditing
+node ace configure adonis-auditing
+```
+
+Para AdonisJS v6:
+
+```sh
+# npm
+npm install adonis-auditing@adonis6
 node ace configure adonis-auditing
 ```
 

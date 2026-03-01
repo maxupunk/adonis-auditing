@@ -1,4 +1,4 @@
-import ConfigureCommand from '@adonisjs/core/commands/configure'
+import type ConfigureCommand from '@adonisjs/core/commands/configure'
 import { stubsRoot } from './stubs/main.js'
 import { readFile, writeFile } from 'node:fs/promises'
 import { parseTsconfig } from 'get-tsconfig'

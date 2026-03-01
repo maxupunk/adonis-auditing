@@ -1,5 +1,5 @@
 import app from '@adonisjs/core/services/app'
-import { AuditingService } from '../src/types.js'
+import type { AuditingService } from '../src/types.js'
 
 let auditing: AuditingService
 

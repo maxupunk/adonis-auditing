@@ -1,12 +1,11 @@
 import { getActiveTest } from '@japa/runner'
 import { join } from 'node:path'
-import { Database } from '@adonisjs/lucid/database'
 import { IgnitorFactory } from '@adonisjs/core/factories'
 import { defineConfig as defineLucidConfig } from '@adonisjs/lucid'
 import { defineConfig } from '../src/define_config.js'
-
-import { UserResolver, TenantResolver, Resolver } from '../src/types.js'
 import stringHelpers from '@adonisjs/core/helpers/string'
+import type { Database } from '@adonisjs/lucid/database'
+import type { UserResolver, TenantResolver, Resolver } from '../src/types.js'
 
 class FakeUserResolver implements UserResolver {
   async resolve() {

@@ -1,4 +1,4 @@
-import { HttpContext } from '@adonisjs/core/http'
+import type { HttpContext } from '@adonisjs/core/http'
 
 export interface UserResolver {
   resolve(ctx: HttpContext): Promise<{ id: string; type: string } | null>

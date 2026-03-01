@@ -1,6 +1,6 @@
-import { AuditingService, ResolvedAuditingConfig } from './types.js'
 import { HttpContext } from '@adonisjs/core/http'
-import { ApplicationService, LoggerService } from '@adonisjs/core/types'
+import type { ApplicationService, LoggerService } from '@adonisjs/core/types'
+import type { AuditingService, ResolvedAuditingConfig } from './types.js'
 
 export default class AuditingManager implements AuditingService {
   constructor(

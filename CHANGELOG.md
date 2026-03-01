@@ -2,6 +2,18 @@
 
 ## [Unreleased]
 
+## [2.0.0](https://github.com/maxupunk/adonis-auditing/compare/v1.2.6...v2.0.0) (2026-03-01)
+
+### Breaking Changes
+
+- deps: require AdonisJS v7 (Core 7, Auth 10, Lucid 22)
+
+### Dependencies
+
+- deps: update AdonisJS packages to the v7 line
+- deps: replace ts-node/@swc/core with @poppinss/ts-exec and add youch
+- tooling: update eslint to ^9.9.0
+
 ## [1.2.6](https://github.com/maxupunk/adonis-auditing/compare/v1.2.5...v1.2.6) (2026-02-02)
 
 ### Features
