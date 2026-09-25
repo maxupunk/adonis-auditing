@@ -1,7 +1,6 @@
 import type ConfigureCommand from '@adonisjs/core/commands/configure'
 import { stubsRoot } from './stubs/main.js'
 import { readFile, writeFile } from 'node:fs/promises'
-import { parseTsconfig } from 'get-tsconfig'
 
 export async function configure(command: ConfigureCommand) {
   const codemods = await command.createCodemods()
@@ -24,29 +23,48 @@ export async function configure(command: ConfigureCommand) {
   await codemods.makeUsingStub(stubsRoot, 'resolvers/user_resolver.stub', {})
   await codemods.makeUsingStub(stubsRoot, 'resolvers/tenant_resolver.stub', {})
 
-  // add imports
-  const packageJsonPath = command.app.makePath('package.json')
-  const packageJson = await readFile(packageJsonPath, 'utf-8').then(JSON.parse)
-  packageJson.imports = {
-    ...packageJson.imports,
-    '#audit_resolvers/*': './app/audit_resolvers/*.js',
+  // add imports to package.json
+  try {
+    const packageJsonPath = command.app.makePath('package.json')
+    const packageJson = await readFile(packageJsonPath, 'utf-8').then(JSON.parse)
+    packageJson.imports = {
+      ...packageJson.imports,
+      '#audit_resolvers/*': './app/audit_resolvers/*.js',
+    }
+    await writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2), {
+      encoding: 'utf-8',
+    })
+  } catch (error) {
+    command.logger.warning(
+      'Failed to automatically register subpath imports in package.json: ' +
+        (error instanceof Error ? error.message : String(error))
+    )
   }
-  await writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2), {
-    encoding: 'utf-8',
-  })
 
-  // add tsconfig paths
-  const tsConfigJsonPath = command.app.makePath('tsconfig.json')
+  // add paths to tsconfig.json (preserving "extends" and original file structure)
+  try {
+    const tsConfigJsonPath = command.app.makePath('tsconfig.json')
+    const rawTsConfig = await readFile(tsConfigJsonPath, 'utf-8')
+    const cleanJson = rawTsConfig.replace(
+      /\\"|"(?:\\"|[^"])*"|(\/\/.*|\/\*[\s\S]*?\*\/)/g,
+      (m, g) => (g ? '' : m)
+    )
+    const tsConfigJson = JSON.parse(cleanJson)
 
-  const tsConfigJson = parseTsconfig(tsConfigJsonPath)
-  tsConfigJson.compilerOptions = {
-    ...tsConfigJson.compilerOptions,
-    paths: {
-      ...tsConfigJson.compilerOptions?.paths,
-      '#audit_resolvers/*': ['./app/audit_resolvers/*.js'],
-    },
+    tsConfigJson.compilerOptions = {
+      ...tsConfigJson.compilerOptions,
+      paths: {
+        ...tsConfigJson.compilerOptions?.paths,
+        '#audit_resolvers/*': ['./app/audit_resolvers/*.js'],
+      },
+    }
+    await writeFile(tsConfigJsonPath, JSON.stringify(tsConfigJson, null, 2), {
+      encoding: 'utf-8',
+    })
+  } catch (error) {
+    command.logger.warning(
+      'Failed to automatically update tsconfig.json paths: ' +
+        (error instanceof Error ? error.message : String(error))
+    )
   }
-  await writeFile(tsConfigJsonPath, JSON.stringify(tsConfigJson, null, 2), {
-    encoding: 'utf-8',
-  })
 }

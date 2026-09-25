@@ -5,10 +5,10 @@ import { HttpContext } from '@adonisjs/core/http'
 import { TenantResolver } from 'adonis-auditing'
 
 export default class implements TenantResolver {
-  async resolve({ auth }: HttpContext): Promise<{ id: number | string } | null> {
-    // Adjust this according to your user model structure
-    // This example assumes the user has a tenantId property
-    const user = auth.user as { tenantId?: number | string } | undefined
+  async resolve(ctx: HttpContext): Promise<{ id: number | string } | null> {
+    // Adjust this according to your user/tenant model structure
+    const auth = (ctx as any).auth
+    const user = auth?.user as { tenantId?: number | string } | undefined
     return user?.tenantId ? { id: user.tenantId } : null
   }
 }

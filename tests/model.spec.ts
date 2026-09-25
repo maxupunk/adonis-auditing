@@ -499,4 +499,136 @@ test.group('BaseModel with auditable', (group) => {
     assert.deepEqual(audit!.oldValues, { id: book.id, name: '******' })
     assert.deepEqual(audit!.newValues, { id: book.id, name: '******' })
   })
+
+  test('delete event after fetching model from database', async ({ assert }) => {
+    const { db } = await setupApp()
+    await resetTables(db)
+
+    const { withAuditable } = await import('../src/auditable/factory.js')
+    const Auditable = withAuditable()
+    class Book extends compose(BaseModel, Auditable) {
+      @column()
+      declare id: number
+
+      @column()
+      declare name: string
+    }
+
+    const created = await Book.create({ name: 'The Hobbit' })
+    const fetched = await Book.findOrFail(created.id)
+    await fetched.delete()
+
+    const deleteAudit = await Audit.query()
+      .where('auditableType', 'Book')
+      .where('auditableId', created.id)
+      .where('event', 'delete')
+      .firstOrFail()
+
+    assert.isNotNull(deleteAudit)
+    assert.equal(deleteAudit.event, 'delete')
+    assert.deepEqual(deleteAudit.oldValues, { id: created.id, name: 'The Hobbit' })
+  })
+
+  test('supports custom primary key column name', async ({ assert }) => {
+    const { db } = await setupApp()
+    await resetTables(db)
+
+    const { withAuditable } = await import('../src/auditable/factory.js')
+    const Auditable = withAuditable()
+
+    class Product extends compose(BaseModel, Auditable) {
+      static table = 'products'
+      static primaryKey = 'productId'
+
+      @column({ isPrimary: true })
+      declare productId: number
+
+      @column()
+      declare title: string
+    }
+
+    const product = new Product()
+    product.title = 'Ergonomic Keyboard'
+    await product.save()
+
+    const audits = await product.audits()
+    assert.lengthOf(audits, 1)
+
+    const first = await product.audits().first()
+    assert.isNotNull(first)
+    assert.equal(first!.auditableType, 'Product')
+    assert.equal(Number(first!.auditableId), product.productId)
+    assert.deepEqual(first!.newValues, {
+      productId: product.productId,
+      title: 'Ergonomic Keyboard',
+    })
+
+    product.title = 'Mechanical Keyboard'
+    await product.save()
+
+    const last = await product.audits().last()
+    assert.equal(last!.event, 'update')
+    assert.deepEqual(last!.oldValues, { title: 'Ergonomic Keyboard' })
+    assert.deepEqual(last!.newValues, { title: 'Mechanical Keyboard' })
+  })
+
+  test('does not create false audit updates when Date or Luxon DateTime values are identical', async ({
+    assert,
+  }) => {
+    const { db } = await setupApp()
+    await resetTables(db)
+
+    const { withAuditable } = await import('../src/auditable/factory.js')
+    const Auditable = withAuditable()
+
+    class Book extends compose(BaseModel, Auditable) {
+      @column()
+      declare id: number
+
+      @column()
+      declare name: string
+
+      @column.dateTime({ autoCreate: true, autoUpdate: true })
+      declare updatedAt: any
+    }
+
+    const book = new Book()
+    book.name = 'The Hobbit'
+    await book.save()
+
+    // No actual field changed
+    await book.save()
+
+    const audits = await book.audits()
+    assert.lengthOf(audits, 1)
+  })
+
+  test('handles failing userResolver gracefully without crashing model operation', async ({
+    assert,
+  }) => {
+    const { db } = await setupApp({ auditing: { failingUserResolver: true } })
+    await resetTables(db)
+
+    const { withAuditable } = await import('../src/auditable/factory.js')
+    const Auditable = withAuditable()
+
+    class Book extends compose(BaseModel, Auditable) {
+      @column()
+      declare id: number
+
+      @column()
+      declare name: string
+    }
+
+    const book = new Book()
+    book.name = 'Resilient Hobbit'
+    // Saving should succeed even if userResolver throws an error
+    await book.save()
+
+    const audits = await book.audits()
+    assert.lengthOf(audits, 1)
+    const audit = audits[0]
+    assert.isNull(audit.userId)
+    assert.isNull(audit.userType)
+  })
 })

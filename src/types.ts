@@ -23,7 +23,7 @@ export interface AuditingConfig {
    * When configured, the resolved tenant ID is stored in the tenant_id column.
    */
   tenantResolver?: () => Promise<{ default: new () => TenantResolver }>
-  resolvers: Record<string, () => Promise<{ default: new () => Resolver }>>
+  resolvers?: Record<string, () => Promise<{ default: new () => Resolver }>>
   /**
    * When true, update events will store full snapshots (all attributes) in oldValues/newValues.
    * When false (default), only the changed attributes are stored for updates.

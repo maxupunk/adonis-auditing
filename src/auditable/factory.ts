@@ -26,6 +26,30 @@ export interface AuditsCursor extends Promise<Audit[]> {
   last: () => Promise<Audit | null>
 }
 
+function areValuesEqual(a: unknown, b: unknown): boolean {
+  if (a === b) return true
+  if (a instanceof Date && b instanceof Date) {
+    return a.getTime() === b.getTime()
+  }
+  if (
+    typeof a === 'object' &&
+    a !== null &&
+    typeof b === 'object' &&
+    b !== null &&
+    'isLuxonDateTime' in a &&
+    'isLuxonDateTime' in b &&
+    typeof (a as any).equals === 'function'
+  ) {
+    return (a as any).equals(b)
+  }
+  return false
+}
+
+function getModelPrimaryKeyValue(model: any): any {
+  const pkField = model?.constructor?.primaryKey || 'id'
+  return model?.[pkField] ?? model?.$primaryKeyValue ?? model?.id
+}
+
 export function withAuditable() {
   return <T extends NormalizeConstructor<typeof BaseModel>>(superclass: T) => {
     class ModelWithAudit extends superclass {
@@ -33,21 +57,23 @@ export function withAuditable() {
       static innerAuditing: AuditingService
 
       audits() {
+        const primaryKeyValue = getModelPrimaryKeyValue(this)
         const audits = Audit.query()
           .where('auditableType', this.constructor.name)
-          .where('auditableId', (this as any).id)
+          .where('auditableId', primaryKeyValue)
         const promise = Promise.resolve(audits.clone())
+
         Object.defineProperty(promise, 'first', {
-          value: async function () {
-            return audits.clone().first()
-          },
-        }).catch((e) => console.error(e))
+          value: async () => audits.clone().first(),
+          configurable: true,
+          writable: true,
+        })
 
         Object.defineProperty(promise, 'last', {
-          value: async function () {
-            return audits.clone().orderBy('id', 'desc').first()
-          },
-        }).catch((e) => console.error(e))
+          value: async () => audits.clone().orderBy('id', 'desc').first(),
+          configurable: true,
+          writable: true,
+        })
 
         return promise as AuditsCursor
       }
@@ -57,8 +83,9 @@ export function withAuditable() {
           throw new E_AUDITABLE_WRONG_TYPE([this.constructor.name, audit.auditableType])
         }
 
-        if (audit.auditableId !== (this as any).id) {
-          throw new E_AUDITABLE_WRONG_INSTANCE([(this as any).id, '' + audit.auditableId])
+        const primaryKeyValue = getModelPrimaryKeyValue(this)
+        if (String(audit.auditableId) !== String(primaryKeyValue)) {
+          throw new E_AUDITABLE_WRONG_INSTANCE([String(primaryKeyValue), String(audit.auditableId)])
         }
 
         const values = valuesType === 'old' ? audit.oldValues : audit.newValues
@@ -94,7 +121,7 @@ export function withAuditable() {
       $auditValuesToSave: ModelObject = {}
 
       $backupAuditValues() {
-        this.$auditValuesToSave = this.$original
+        this.$auditValuesToSave = { ...this.$original }
       }
 
       async $audit(event: EventType, modelInstance: ModelWithAudit) {
@@ -152,8 +179,8 @@ export function withAuditable() {
             if (ignored.has(key)) continue
             const beforeVal = (beforeFull as any)[key]
             const afterVal = (after as any)[key]
-            // Use strict equality; for objects/arrays, shallow reference check
-            const equal = beforeVal === afterVal
+            // Use defensive equality comparison (supporting Date, Luxon DateTime, primitives)
+            const equal = areValuesEqual(beforeVal, afterVal)
             if (!equal) {
               changedOld[key] = beforeVal
               changedNew[key] = afterVal
@@ -179,14 +206,14 @@ export function withAuditable() {
         audit.userId = auditedUser?.id ?? null
         audit.event = event
         audit.auditableType = modelInstance.constructor.name
-        audit.auditableId = (modelInstance as any).id
+        audit.auditableId = getModelPrimaryKeyValue(modelInstance)
         audit.oldValues = oldValues
         audit.newValues = newValues
         audit.metadata = metadata
 
         // Multitenancy support: use tenantResolver first, fallback to model's tenantId
-        if (tenantId !== null) {
-          audit.tenantId = tenantId as number
+        if (tenantId !== null && tenantId !== undefined) {
+          audit.tenantId = tenantId
         } else if ('tenantId' in modelInstance && (modelInstance as any).tenantId !== undefined) {
           audit.tenantId = (modelInstance as any).tenantId
         }

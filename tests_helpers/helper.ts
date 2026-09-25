@@ -26,12 +26,19 @@ class FooResolver implements Resolver {
   }
 }
 
+class FailingUserResolver implements UserResolver {
+  async resolve(): Promise<{ id: string; type: string } | null> {
+    throw new Error('Resolver explosion!')
+  }
+}
+
 interface SetupOverrides {
   auditing?: {
     fullSnapshotOnUpdate?: boolean
     ignoredFieldsOnUpdate?: string[]
     hiddenFields?: string[]
     tenantId?: number | string | null
+    failingUserResolver?: boolean
   }
 }
 
@@ -73,7 +80,9 @@ export async function setupApp(overrides?: SetupOverrides) {
           },
         }),
         auditing: defineConfig({
-          userResolver: async () => ({ default: FakeUserResolver }),
+          userResolver: overrides?.auditing?.failingUserResolver
+            ? async () => ({ default: FailingUserResolver })
+            : async () => ({ default: FakeUserResolver }),
           tenantResolver: tenantResolverConfig,
           resolvers: {
             foo: async () => ({ default: FooResolver }),
@@ -117,6 +126,7 @@ export async function resetTables(db: Database) {
     await db.connection().schema.dropTableIfExists('users')
     await db.connection().schema.dropTableIfExists('books')
     await db.connection().schema.dropTableIfExists('movies')
+    await db.connection().schema.dropTableIfExists('products')
     await db.connection().schema.dropTableIfExists('audits')
   })
 
@@ -135,6 +145,12 @@ export async function resetTables(db: Database) {
   await db.connection().schema.createTable('movies', (table) => {
     table.increments('id').notNullable()
     table.string('name').unique().notNullable()
+    table.timestamps()
+  })
+
+  await db.connection().schema.createTable('products', (table) => {
+    table.increments('product_id').primary()
+    table.string('title').notNullable()
     table.timestamps()
   })
 

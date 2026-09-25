@@ -13,8 +13,9 @@ export function defineConfig(config: AuditingConfig): ConfigProvider<ResolvedAud
       tenantResolver = new tenantResolverModule.default()
     }
 
+    const rawResolvers = config.resolvers ?? {}
     const resolversMap = await Promise.all(
-      Object.entries(config.resolvers).map(async ([key, value]) => {
+      Object.entries(rawResolvers).map(async ([key, value]) => {
         const resolver = await value()
         return [key, new resolver.default()] as const
       })

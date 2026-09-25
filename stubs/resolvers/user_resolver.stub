@@ -5,7 +5,14 @@ import { HttpContext } from '@adonisjs/core/http'
 import { UserResolver } from 'adonis-auditing'
 
 export default class implements UserResolver {
-  async resolve({ auth }: HttpContext): Promise<{ id: string; type: string } | null> {
-    return auth.user ? { id: '' + auth.user.id, type: 'User' } : null
+  async resolve(ctx: HttpContext): Promise<{ id: string; type: string } | null> {
+    const auth = (ctx as any).auth
+    if (auth?.user) {
+      return {
+        id: String(auth.user.id),
+        type: auth.user.constructor?.name || 'User',
+      }
+    }
+    return null
   }
 }

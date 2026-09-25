@@ -17,16 +17,29 @@ export default class AuditingManager implements AuditingService {
     return this.app.getEnvironment() === 'web'
   }
 
-  async getUserForContext(): Promise<{ id: string; type: string } | null> {
+  /**
+   * Safe access to the current HttpContext, logging a warning only in web environment if missing.
+   */
+  protected getContext(): HttpContext | null {
     const ctx = HttpContext.get()
+    if (!ctx && this.isWebEnvironment()) {
+      this.logger.warn('Cannot get current context, did you forget to enable asyncLocalStorage?')
+    }
+    return ctx ?? null
+  }
+
+  async getUserForContext(): Promise<{ id: string; type: string } | null> {
+    const ctx = this.getContext()
     if (!ctx) {
-      if (this.isWebEnvironment()) {
-        this.logger.warn('Cannot get current context, did you forget to enable asyncLocalStorage?')
-      }
       return null
     }
 
-    return this.config.userResolver.resolve(ctx)
+    try {
+      return await this.config.userResolver.resolve(ctx)
+    } catch (error) {
+      this.logger.warn('Failed to resolve user for audit context', error)
+      return null
+    }
   }
 
   async getTenantIdForContext(): Promise<number | string | null> {
@@ -34,29 +47,29 @@ export default class AuditingManager implements AuditingService {
       return null
     }
 
-    const ctx = HttpContext.get()
+    const ctx = this.getContext()
     if (!ctx) {
-      if (this.isWebEnvironment()) {
-        this.logger.warn('Cannot get current context, did you forget to enable asyncLocalStorage?')
-      }
       return null
     }
 
-    const result = await this.config.tenantResolver.resolve(ctx)
-    return result?.id ?? null
+    try {
+      const result = await this.config.tenantResolver.resolve(ctx)
+      return result?.id ?? null
+    } catch (error) {
+      this.logger.warn('Failed to resolve tenant for audit context', error)
+      return null
+    }
   }
 
   async getMetadataForContext(): Promise<Record<string, unknown>> {
-    const ctx = HttpContext.get()
+    const ctx = this.getContext()
     if (!ctx) {
-      if (this.isWebEnvironment()) {
-        this.logger.warn('Cannot get current context, did you forget to enable asyncLocalStorage?')
-      }
       return {}
     }
 
+    const resolvers = this.config.resolvers ?? {}
     const promiseResults = await Promise.allSettled(
-      Object.entries(this.config.resolvers).map(
+      Object.entries(resolvers).map(
         async ([key, resolver]) => [key, await resolver.resolve(ctx)] as const
       )
     )
